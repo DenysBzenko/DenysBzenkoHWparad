@@ -10,7 +10,7 @@ void append_text() {
     char input[100];
     printf("Enter text to append: ");
     fgets(input, sizeof(input), stdin);
-    strncat_s(text, sizeof(text), input, sizeof(text) - strlen(text) - 1);
+    strncat_s(text, sizeof(text), input, sizeof(input) - 1);
 }
 
 void start_new_line() {
@@ -53,7 +53,13 @@ void load_from_file() {
         return;
     }
 
-    fread(text, sizeof(char), sizeof(text), file);
+    char ch;
+    int index = 0;
+    while ((ch = fgetc(file)) != EOF && index < MAX_TEXT_SIZE - 1) {
+        text[index++] = ch;
+    }
+    text[index] = '\0';
+
     fclose(file);
     printf("Text has been loaded successfully\n");
 }
@@ -63,12 +69,11 @@ void print_text() {
 }
 
 void insert_text_by_index() {
-    // Залишаємо функцію без змін, оскільки вона вже використовує _s функції.
     int line, index;
     char input[100];
 
     printf("Choose line and index: ");
-    scanf_s("%d %d", &line, &index, 1);
+    scanf_s("%d %d", &line, &index);
     while (getchar() != '\n');
 
     printf("Enter text to insert: ");
@@ -121,7 +126,7 @@ int main() {
         printf("6. Exit\n");
 
         int choice;
-        scanf_s("%d", &choice, 1);
+        scanf_s("%d", &choice);
         while (getchar() != '\n');
 
         switch (choice) {
@@ -136,7 +141,7 @@ int main() {
             printf("1. Save to file\n");
             printf("2. Load from file\n");
             int file_choice;
-            scanf_s("%d", &file_choice, 1);
+            scanf_s("%d", &file_choice);
             while (getchar() != '\n');
             if (file_choice == 1) {
                 save_to_file();
