@@ -10,7 +10,13 @@ void append_text() {
     char input[100];
     printf("Enter text to append: ");
     fgets(input, sizeof(input), stdin);
+
+    size_t len = strlen(text); 
     strncat_s(text, sizeof(text), input, sizeof(input) - 1);
+
+    if (len + strlen(input) < sizeof(text) && text[len + strlen(input) - 1] == '\n') {
+        text[len + strlen(input) - 1] = '\0';
+    }
 }
 
 void start_new_line() {
@@ -68,20 +74,24 @@ void print_text() {
     printf("%s\n", text);
 }
 
+
 void insert_text_by_index() {
     int line, index;
     char input[100];
 
-    printf("Choose line and index: ");
+    printf("Choose line and index (starting from 0): ");
     scanf_s("%d %d", &line, &index);
     while (getchar() != '\n');
 
     printf("Enter text to insert: ");
     fgets(input, sizeof(input), stdin);
 
+    char copy[MAX_TEXT_SIZE];
+    strcpy_s(copy, sizeof(copy), text); 
+
     char* lines[MAX_TEXT_SIZE];
     char* next_token = NULL;
-    char* token = strtok_s(text, "\n", &next_token);
+    char* token = strtok_s(copy, "\n", &next_token);
     int i = 0;
     while (token) {
         lines[i++] = token;
@@ -89,12 +99,16 @@ void insert_text_by_index() {
     }
 
     if (line >= i) {
+        strcat_s(text, sizeof(text), "\n");
         strcat_s(text, sizeof(text), input);
         return;
     }
 
-    char new_text[MAX_TEXT_SIZE] = "";
+    if (index > strlen(lines[line])) {
+        index = strlen(lines[line]);
+    }
 
+    char new_text[MAX_TEXT_SIZE] = "";
     for (int j = 0; j < line; j++) {
         strcat_s(new_text, sizeof(new_text), lines[j]);
         strcat_s(new_text, sizeof(new_text), "\n");
@@ -124,6 +138,7 @@ int main() {
         printf("4. Print the current text to console\n");
         printf("5. Insert the text by line and symbol index\n");
         printf("6. Exit\n");
+        printf("7. Clear terminal.\n");
 
         int choice;
         scanf_s("%d", &choice);
@@ -148,7 +163,7 @@ int main() {
             }
             else if (file_choice == 2) {
                 load_from_file();
-            }
+            } 
             else {
                 printf("Invalid choice!\n");
             }
@@ -163,6 +178,9 @@ int main() {
             return 0;
         default:
             printf("Invalid choice!\n");
+        case 7:
+            system("cls");
+            break;
         }
     }
 
